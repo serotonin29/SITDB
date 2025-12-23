@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 249, 250, 251;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 17, 24, 39;
+    --background-end-rgb: 31, 41, 55;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Leaflet map overrides */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+/* Disaster type colors */
+.disaster-banjir { --disaster-color: #3b82f6; }
+.disaster-gempa { --disaster-color: #ef4444; }
+.disaster-kebakaran { --disaster-color: #f97316; }
+.disaster-longsor { --disaster-color: #84cc16; }
+.disaster-tsunami { --disaster-color: #06b6d4; }
+.disaster-angin_topan { --disaster-color: #8b5cf6; }
+.disaster-kekeringan { --disaster-color: #eab308; }
+.disaster-lainnya { --disaster-color: #6b7280; }
+
+/* Severity badges */
+.severity-ringan { @apply bg-green-100 text-green-800; }
+.severity-sedang { @apply bg-yellow-100 text-yellow-800; }
+.severity-berat { @apply bg-orange-100 text-orange-800; }
+.severity-kritis { @apply bg-red-100 text-red-800; }
+
+/* Status badges */
+.status-pending { @apply bg-gray-100 text-gray-800; }
+.status-verified { @apply bg-blue-100 text-blue-800; }
+.status-in_progress { @apply bg-yellow-100 text-yellow-800; }
+.status-resolved { @apply bg-green-100 text-green-800; }
+.status-rejected { @apply bg-red-100 text-red-800; }
+
+/* Animations */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Glassmorphism */
+.glass {
+  @apply bg-white/70 backdrop-blur-lg border border-white/20;
+}
+
+.glass-dark {
+  @apply bg-gray-900/70 backdrop-blur-lg border border-gray-700/50;
+}

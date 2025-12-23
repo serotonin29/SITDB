@@ -1,0 +1,124 @@
+// Prisma Schema for SITDB - Sistem Informasi Tanggap Darurat Bencana
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ============================================
+// MODELS (SQLite compatible - no enums)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  role          String    @default("MASYARAKAT") // MASYARAKAT, RELAWAN, RELAWAN_MEDIS, RELAWAN_LAPANGAN, KOORDINATOR, ADMIN, DONOR
+  status        String    @default("PENDING") // PENDING, ACTIVE, INACTIVE, REJECTED
+  
+  // Verification Data
+  instansi      String?
+  keahlian      String?
+  sertifikasi   String?
+  
+  emailVerified DateTime?
+  image         String?
+  lastLoginAt   DateTime?
+  
+  // Timestamps & Soft Delete
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  reports       DisasterReport[]
+  statusUpdates ReportStatus[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model DisasterReport {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // BANJIR, GEMPA, KEBAKARAN, LONGSOR, TSUNAMI, ANGIN_TOPAN, KEKERINGAN, LAINNYA
+  title       String
+  description String
+  latitude    Float
+  longitude   Float
+  address     String?
+  severity    String   // RINGAN, SEDANG, BERAT, KRITIS
+  status      String   @default("PENDING") // PENDING, VERIFIED, IN_PROGRESS, RESOLVED, REJECTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statusHistory ReportStatus[]
+  media         ReportMedia[]
+
+  @@index([status])
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt])
+  @@index([latitude, longitude])
+  @@map("disaster_reports")
+}
+
+model ReportStatus {
+  id        String   @id @default(cuid())
+  reportId  String
+  userId    String
+  status    String   // PENDING, VERIFIED, IN_PROGRESS, RESOLVED, REJECTED
+  notes     String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  report DisasterReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([createdAt])
+  @@map("report_statuses")
+}
+
+model ReportMedia {
+  id        String   @id @default(cuid())
+  reportId  String
+  url       String
+  type      String   // IMAGE, VIDEO
+  filename  String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  report DisasterReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@map("report_media")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  changes   String?  // JSON string for SQLite
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
